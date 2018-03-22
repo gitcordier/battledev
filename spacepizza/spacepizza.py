@@ -9,7 +9,7 @@
 ###############################################################################
 # We are given N (N > 4) points {a, b, c, ...} of the physical space.
 # Each of them is so equipped with cartesian coordinates (x, y, z). 
-# From now on, we assume that two distinct points have differents y's.
+# From now on, we assume that two distinct points have different y's.
 #   NB (*):
 #   Our points are then ordered with respect to the following total and 
 #   strict order R:
@@ -37,30 +37,35 @@
 # 
 #   vi. Finally, we come back to p_min. So ends the journey :)
 # 
-# It seems there are many possible trips, then (Actually, yes. There are
+# It seems there are many possible trips, then (actually, yes: There are
 # exactly 2^(N-2) possible trips)!
 # 
 # So arises the question: What is the shortest one?
 #
 # This is what we aim at computing now. 
 #
-# To do so, we split the set of all possible paths into subsets S(i):
-#
-#   S(i) = {    
-#               Alls trips during which the point #i is visited 
-#               just before we 'jump' to the 'highest point,i.e. 
-#               the point #(N-1). 
-#          } 
-#   (i = 0, 1, 2, ..., N-2)
+# To do so, we first sort the points by increasing y, so that the y of 
+# node #j is smaller than the y of node #i (j < i).
 # 
-# Given i, there so exits a minimal
-# distance for the whole trip, namely 
+# Next, we split the set of all possible paths into subsets S(i): 
 #
-#   min_i_total := min{length of 'trip', as 'trip' is a trip in S(i)} 
+#   S(i) := {    
+#               All trips during which the point #i is visited 
+#               just before we 'jump' to the 'highest point, i.e. 
+#               the point #(N-1). 
+#       } 
+#   (i = 0, 1, 2, ..., N-2)
+#
+# Given i, there so exits a minimal distance for the whole trip, namely 
+#
+#   min_i_total := min{lengths of trips in S(i)} 
 #
 # The wished minimal length is then 
 #
-#   min_i_total = min{min_i_total: i = 0, 1, 2, ..., N-1} .
+#   min_i_total := min{min_i_total: i = 0, 1, 2, ..., N-1} .
+#
+# From now on, d(j,i) denotes the distance between the nodes #i,#j, 
+# as i < j. 
 #
 # In the below figure, each point is identified with its index
 # 
@@ -73,31 +78,35 @@
 #          |j|_   <---|-------| What happens here has a minimal length
 #           |  \_     |            min_j. Does NOT depend on min_i.
 #           |    \_   |
-#           |      \_ |
+#           |      \__|
 #           |        j+1
 #           |         |
 #           |        i-1
-#           _         |
+#           |         |
 #          |i|_  <----|-------| What happens here has a minimal length
 #           |  \_     |            min_i
 #           |    \_   |
-#           |      \_ |_
-#           |        |i+1|
+#           |      \__|_
+#           |       |i+1|
 #           |        ...
 #           |        N-2  <--| In the below part, distances are fixed,
 #           N-1      N-1           provided i
 #
 # NB:
-#   For symmetry reasons, we assume that point N-2 is part of the 
-#   return. In other words, i is actually bounded by N-2. 
-# 
-# Assume that we have already computed min_0, ..., min_j (j < i).
-# We can therefore compute m_i then straightforwardly obtain 
-# min_i_total.
-# Since m_0 is trivial, it follows from the induction principle that 
-# the below function returns the desired result. 
+#   For symmetry reasons, we can assume that point #N-2 is part of the 
+#   return, then discard the case i = N-2.
+#
+# Assume that we know min_0, ..., min_j (j < i), provided i: We can 
+# compute m_i then straightforwardly obtain min_i_total.
+# Since m_0 = d(0, 1), it follows from the induction principle that 
+# all m_i_total's are computable.
+#
+# The below function compute_min implements the such routines and so
+# returns the desired result.
+#
 # It can be proved that the whole cost (in time) is O(N^2) in the worst
 # case.
+# 
 ########################################################################
 import sys
 from operator import itemgetter
@@ -114,11 +123,8 @@ for line in sys.stdin:
 N = int(lines[0])
 
 # From lines, get a "y-sorted" list of the points, aka 'node_', 
-# so that the y of node_[j] is smaller than the y of node_[i] (j < i).
-#
-# From now on:
-#   - The convention is: j < i.
-#   - d(j,i) denotes the distance between the nodes #i,#j.
+# so that the y of node #j is smaller than the y of node #i (j < i).
+
 
 nodes_unsorted_as_strings   = lines[1: ]
 nodes_unsorted              = []
