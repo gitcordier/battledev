@@ -104,7 +104,7 @@
 # Assume that we know min_0, ..., min_j (j < i), provided i: 
 # We can compute m_i then straightforwardly obtain min_i_total.
 # Since m_0 = d(0, 1), it follows from the induction principle that all 
-# m_i_total's re computable (time complexity: O(N^2)).
+# m_i_total's are computable (time complexity: O(N^2)).
 #
 # The below function compute_min implements the latter routine and so 
 # returns the desired result.
