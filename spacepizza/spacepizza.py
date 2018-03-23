@@ -89,7 +89,7 @@
 #           |        i-1
 #           |         |
 #          |i|_  <----|-------| What happens here has a minimal length
-#           |  \_     |         min_i
+#           |  \_     |         min_i.
 #           |    \_   |
 #           |      \__|_
 #           |       |i+1|
