@@ -1,5 +1,6 @@
 ###############################################################################
-# Solution to DNA problem (battledev (FR) 11/2017)                            #
+# Solution to DNA (in French: ADN) problem (battledev (FR) 11/2017)           #
+#     https://www.isograd.com/FR/solutionconcours.php?contest_id=28           #
 #     https://questionsacm.isograd.com/codecontest/pdf/DNA.pdf                #
 # Name:     dna.py .                                                          #
 # Indent:   = 4 spaces (no tab).                                              #
@@ -7,104 +8,63 @@
 # license:  Nope; consider the below code as public domain.                   #
 ###############################################################################
 
-# inputs: BEGINNING ###########################################################
-input = [ # for example:
-    "6", 
-    "G", 
-    "C", 
-    "A", 
-    "T", 
-    "T", 
-    "ACG"
-]
-
+import sys 
+from itertools import permutations
 
 lines = []
-for line in input:
+for line in sys.stdin: # Change 'sys.stdin' to 'input' if you work locally.
 	lines.append(line.rstrip('\n'))
 
-N           = int(lines[0])
-string_     = lines[1: ]
-full_length = len("".join(string_))
-half_length = int(full_length/2)
-#
+strings = lines[1: ]
+N = int(lines[0])
+L = len(''.join(strings))
+Q = L // 2
+S = 'ACTG'
 
-def permute(a_list):
-    """
-        returns all permutations of list.
-    """
-    n = len(a_list)
-    # 
-    if n < 2:
-        return [a_list]
-    #
-    result = []
-    for i in range(n):
-        _ = list(a_list[1: ])
-        if i > 0: 
-            _[i-1]  = a_list[0]
-        #
-        permutation_    =   permute(_)
-        for permutation in  permutation_:
-            permutation.insert(0, a_list[i])
-            result.append(permutation)
-    return result
-#
-permutations_of_string_ = permute(string_)
-
-# Inputs: END #################################################################
+all_permutations = permutations(strings)
 
 def find():
-    return {
-            represent(permutation) for permutation in permutations_of_string_  
-                if test(permutation, "ACTG")
-        }
-#
+    return list({represent(p) for p in all_permutations if test(p)})[0]
 
-def represent(a_list):
+def represent(a):
     """
-        Turns a list ['A', 'B', 'C', ...] of even length into a string
-            "A B ...#...' with '#' at the center.
+        Turns a list (even length) of strings (S, T, U, ...) into a string
+            STU… with '#' right in the middle.
     """
-    lc  = 0             # We'll count the elements 'A', 'B', 'C',  ...
-    ls  = 0             # We'll count the spaces between the elements.
-    s   = ""            # We'll concatenate 'A', 'B', 'C', ... .
-    for e in a_list:
-        s   += e
-        lc  += len(e)
-        ls  += 1
-        #
-        if lc  == half_length:
-            s += "#"
-        elif lc < full_length:
-            s += " "
-    return s
-#
+    c = 0
+    for i in range(N):
+        c += len(a[i])
+        if c == Q:
+            i += 1
+            break
+    u = ' '.join(a[: i])
+    v = ' '.join(a[i: ])
+    return '#'.join((u, v))
 
-def test(permutation, match):
+def test(p):
     ls = 0
-    #
-    for element in permutation:
-        ls     += len(element)
-        #
-        if ls  == half_length:
-            s = "".join(permutation)
-            #
-            for i in range(half_length):
-                if not is_a_match(
-                        s[i], 
-                        s[i + half_length   ], 
-                        match):
+    for e in p:
+        ls += len(e)
+        
+        if ls  == Q:
+            s = ''.join(p)
+            
+            for i in range(Q):
+                if is_a_match((s[i], s[i+Q])):
+                    pass
+                else:
                     return False
             return True
-    return False 
+        elif ls > Q:
+            return False
+        else:
+            pass
+    return True
 
 
-# match = "ACTG"
-def is_a_match(s, t, match):
-    for i in range(len(match) - 2):
-        if  s == match[ i   ] and t == match[ i + 2] or \
-            s == match[-i -1] and t == match[-i - 3]:
+def is_a_match(t):
+    for i in range(len(S) - 2):
+        if t == (S[i], S[i+2]) or t == (S[-1-i], S[-3-i]):
             return True
     return False
 #
